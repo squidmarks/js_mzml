@@ -25,5 +25,10 @@
     "chai": "^4.0.1",
     "fs": "0.0.1-security",
     "mocha": "^3.4.2"
+  },
+  "dependencies": {
+    "base64-js": "^1.2.1",
+    "pako": "^1.0.6",
+    "sax": "^1.2.4"
   }
 }
