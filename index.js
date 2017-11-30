@@ -12,7 +12,7 @@ module.exports = class JsMzml {
 
   // The following code is heavily based on https://github.com/cheminfo-js/mzML
   // Changes have been made to suit my use case
-  retrieve(options) {
+  retrieve(options, callback) {
     var options = options || {};
     var level = options.level || "Both";
     var rtBegin = options.rtBegin || 0;
@@ -26,6 +26,7 @@ module.exports = class JsMzml {
     var readRaw;
     var bitType;
     var isCompressed;
+    var currentIndex = 1;
 
     var self = this;
 
@@ -41,7 +42,8 @@ module.exports = class JsMzml {
             if (Object.keys(entry).length > 0) {
               if (entry.msLevel === level || level === 'Both') {
                 if (entry.time <= rtEnd && entry.time >= rtBegin) {
-                  self.spectra[entry.currentId] = Object.assign({}, entry);
+                  self.spectra[currentIndex] = Object.assign({}, entry);
+                  currentIndex++;
                   entry = {};                  
                 }
               }
@@ -73,6 +75,9 @@ module.exports = class JsMzml {
               case 'zlib compression':
                 isCompressed = true;
                 break;
+              case 'no compression':
+                isCompressed = false;
+                break;
               case 'ms level':
                 entry.msLevel = node.attributes.value;
                 break;
@@ -97,6 +102,14 @@ module.exports = class JsMzml {
 
     saxStream.on("end", function() {
       self.isFinished = true;
+      callback();
+    });
+
+    saxStream.on("error", function(err) {
+      //console.log(node);
+      //console.log(currentId);
+      //console.log(err);
+      self.isFinished = true;
     });
 
     fs.createReadStream(this.filename)
@@ -106,14 +119,13 @@ module.exports = class JsMzml {
   decodeData(raw, bitType, isCompressed) {
     var array = [];
     var buffer = base64.toByteArray(raw);
-    if (isCompressed) {
+    if (isCompressed === true) {
       buffer = pako.inflate(buffer);
     }
-
     if (bitType === '32') {
       return new Float32Array(buffer.buffer);
     }
-    else if (bitType === '64') {
+    else if (bitType === '64') {      
       return new Float64Array(buffer.buffer);
     }
     else {
@@ -121,8 +133,5 @@ module.exports = class JsMzml {
     }
     return [];
   }
-  
-  hello() {
-    return "hello";
-  }
+
 }
