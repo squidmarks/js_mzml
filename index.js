@@ -1,24 +1,24 @@
 var base64 = require('base64-js');
 var pako = require('pako');
-var saxStream = require('sax').createStream(true);
+var sax = require('sax');
 var fs = require('fs');
 
 module.exports = class JsMzml {
   constructor(filename) {
     this.filename = filename;
-    this.spectra = {};
     this.isFinished = true;
   }
 
   // The following code is heavily based on https://github.com/cheminfo-js/mzML
   // Changes have been made to suit my use case
-  retrieve(options, callback) {
+  retrieve(options) {
     var options = options || {};
     var level = options.level || "Both";
     var rtBegin = options.rtBegin || 0;
     var rtEnd = options.rtEnd || 9999999999;
 
     this.isFinished = false;
+    var spectra = {};
     var entry = {};
     var currentId;
     var kind;
@@ -30,7 +30,9 @@ module.exports = class JsMzml {
 
     var self = this;
 
-    saxStream.on("opentag", function(node) {
+    var parser = sax.parser(true, {trim: true});
+
+    parser.onopentag = function(node) {
       readRaw = node.name === 'binary';
 
       switch (node.name) {
@@ -42,7 +44,7 @@ module.exports = class JsMzml {
             if (Object.keys(entry).length > 0) {
               if (entry.msLevel === level || level === 'Both') {
                 if (entry.time <= rtEnd && entry.time >= rtBegin) {
-                  self.spectra[currentIndex] = Object.assign({}, entry);
+                  spectra[currentIndex] = Object.assign({}, entry);
                   currentIndex++;
                   entry = {};                  
                 }
@@ -87,9 +89,9 @@ module.exports = class JsMzml {
           }
           break;
       }
-    });
+    };
 
-    saxStream.on("text", function(raw) {
+    parser.ontext = function(raw) {
       if (readRaw && currentId) {
         if (nextValue === 'MASS') {
           entry.mass = self.decodeData(raw, bitType, isCompressed);
@@ -98,22 +100,25 @@ module.exports = class JsMzml {
         }
         nextValue = null;
       }
-    });
+    };
 
-    saxStream.on("end", function() {
+    parser.onend = function() {
       self.isFinished = true;
-      callback();
-    });
+    };
 
-    saxStream.on("error", function(err) {
+    parser.onerror = function(err) {
       //console.log(node);
       //console.log(currentId);
       //console.log(err);
       self.isFinished = true;
-    });
+    };
 
-    fs.createReadStream(this.filename)
-      .pipe(saxStream);
+    //fs.createReadStream(this.filename)
+    //  .pipe(saxStream);
+
+    var data = fs.readFileSync(this.filename);
+    parser.write(data).close();
+    return spectra;
   }
 
   decodeData(raw, bitType, isCompressed) {
