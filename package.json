@@ -1,6 +1,6 @@
 {
   "name": "js_mzml",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "An mzML parser",
   "main": "index.js",
   "scripts": {

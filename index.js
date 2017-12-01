@@ -107,14 +107,8 @@ module.exports = class JsMzml {
     };
 
     parser.onerror = function(err) {
-      //console.log(node);
-      //console.log(currentId);
-      //console.log(err);
       self.isFinished = true;
     };
-
-    //fs.createReadStream(this.filename)
-    //  .pipe(saxStream);
 
     var data = fs.readFileSync(this.filename);
     parser.write(data).close();
