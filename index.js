@@ -110,8 +110,11 @@ module.exports = class JsMzml {
       self.isFinished = true;
     };
 
-    var data = fs.readFileSync(this.filename);
-    parser.write(data).close();
+    //var data = fs.readFileSync(this.filename);
+    //parser.write(data).close();
+    var stream = fs.createReadStream(this.filename);
+    parser = sax.createStream(true, {trim: true});
+    stream.pipe(parser);
     return spectra;
   }
 
