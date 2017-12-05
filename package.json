@@ -27,8 +27,11 @@
     "mocha": "^3.4.2"
   },
   "dependencies": {
+    "await-stream-ready": "^1.0.1",
     "base64-js": "^1.2.1",
+    "finished": "^1.2.2",
     "pako": "^1.0.6",
-    "sax": "^1.2.4"
+    "sax": "^1.2.4",
+    "sync-fs": "^1.0.1"
   }
 }

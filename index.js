@@ -1,17 +1,19 @@
 var base64 = require('base64-js');
 var pako = require('pako');
 var sax = require('sax');
-var fs = require('fs');
+var fs = require('sync-fs');
+var onFinished = require('finished');
 
 module.exports = class JsMzml {
   constructor(filename) {
     this.filename = filename;
     this.isFinished = true;
+    this.spectra = {};
   }
 
   // The following code is heavily based on https://github.com/cheminfo-js/mzML
   // Changes have been made to suit my use case
-  retrieve(options) {
+  async retrieve(options, callback) {
     var options = options || {};
     var level = options.level || "Both";
     var rtBegin = options.rtBegin || 0;
@@ -44,7 +46,7 @@ module.exports = class JsMzml {
             if (Object.keys(entry).length > 0) {
               if (entry.msLevel === level || level === 'Both') {
                 if (entry.time <= rtEnd && entry.time >= rtBegin) {
-                  spectra[currentIndex] = Object.assign({}, entry);
+                  self.spectra[currentIndex] = Object.assign({}, entry);
                   currentIndex++;
                   entry = {};                  
                 }
@@ -115,7 +117,15 @@ module.exports = class JsMzml {
     var stream = fs.createReadStream(this.filename);
     parser = sax.createStream(true, {trim: true});
     stream.pipe(parser);
-    return spectra;
+
+    while (self.isFinished === false) {
+      await self.sleep(1000);
+    }
+    //  .on('end', function() {
+    //    callback()
+    //  });
+    //onFinished(parser, callback());
+    //return;
   }
 
   decodeData(raw, bitType, isCompressed) {
@@ -134,6 +144,10 @@ module.exports = class JsMzml {
       return [];
     }
     return [];
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
 }
