@@ -1,7 +1,5 @@
 # js-mzml
 
-> Please note: Files are currently being read synchronously which limits the size of mzML file that can be read. Since mzML files are often large, this is indeed a problem. Code is being worked on to make it asynchronous with a filestream so that there aren't issues with the file size.
-
 js-mzML is a node module for parsing mzML files used in mass spectrometry.
 
 This module is based off of another module [found here](https://github.com/cheminfo-js/mzML), but some changes have been made. Notably:
@@ -28,12 +26,13 @@ var options = {
     'rtEnd': 0.005
 };
 
-var spectra = mzml.retrieve(options);
-console.log(spectra);
+var spectra = mzml.retrieve(options, function() {
+    console.log(mzml.spectra);
+});
 
 ```
 
-The spectra will be returned like this:
+The spectra will be of this form:
 ```javascript
  {'1':
     {
@@ -52,15 +51,16 @@ The spectra will be returned like this:
 }
 
 ```
+There is also an ```example.js``` that you can modify to test things out.
 
-So far this module has only been tested with small mzML files (no)
+js-mzML uses file streams under the hood which means that it is memory efficient and asynchronous-ish. Each js-mzML object has two variables associated with it, ```spectra``` (as discussed above) and ```isFinished```. The variable ```isFinished``` changes to false when the retrive method is called. This value will change to true once the file stream is finished and then the callback will be called. 
 
 ### Options
 The options that can be passed to js-mzML are:
 
-* ```level```: Either '1', '2', or 'Both'. '1' gives you MS data, '2' gives you MS/MS data, and 'Both' gives you both types.
-* ```rtBegin```: This is the earliest retention time you want to return data from. 
-* ```rtEnd```: This is the latest retention time you want to return data from.
+* ```level```: Either '1', '2', or 'Both'. '1' gives you MS data, '2' gives you MS/MS data, and 'Both' gives you both types. The default is 'Both'.
+* ```rtBegin```: This is the earliest retention time you want to return data from. The default is 0.
+* ```rtEnd```: This is the latest retention time you want to return data from. The default is 9999999999.
 
 There is currently to way to declare the units of the retention time, so you will have to make sure those match the units of the files you are processing.
 
@@ -68,10 +68,9 @@ There is currently to way to declare the units of the retention time, so you wil
 Tests can be run with ```npm run test```
 There are spectra in the test folder from http://psidev.info/index.php?q=node/257
 
-No breaking changes are expected in future versions, but this module was created to be part of a larger project so changes may occur.
+No breaking changes are expected in future versions, but this module was created to be part of a larger project, so changes may occur.
 
 ## Future Development
 * Ability to specify minutes/seconds for retention time
-* Maybe the ability to read files asynchronously
 * More MS levels (e.g. MS/MS/MS)
 

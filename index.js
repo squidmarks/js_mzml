@@ -1,26 +1,24 @@
 var base64 = require('base64-js');
 var pako = require('pako');
-var sax = require('sax');
-var fs = require('sync-fs');
-var onFinished = require('finished');
+var saxStream = require('sax').createStream(true);
+var fs = require('fs');
 
 module.exports = class JsMzml {
   constructor(filename) {
     this.filename = filename;
-    this.isFinished = true;
     this.spectra = {};
+    this.isFinished = true;
   }
 
   // The following code is heavily based on https://github.com/cheminfo-js/mzML
   // Changes have been made to suit my use case
-  async retrieve(options, callback) {
+  retrieve(options, callback) {
     var options = options || {};
     var level = options.level || "Both";
     var rtBegin = options.rtBegin || 0;
     var rtEnd = options.rtEnd || 9999999999;
 
     this.isFinished = false;
-    var spectra = {};
     var entry = {};
     var currentId;
     var kind;
@@ -28,13 +26,10 @@ module.exports = class JsMzml {
     var readRaw;
     var bitType;
     var isCompressed;
-    var currentIndex = 1;
 
     var self = this;
 
-    var parser = sax.parser(true, {trim: true});
-
-    parser.onopentag = function(node) {
+    saxStream.on("opentag", function(node) {
       readRaw = node.name === 'binary';
 
       switch (node.name) {
@@ -46,8 +41,7 @@ module.exports = class JsMzml {
             if (Object.keys(entry).length > 0) {
               if (entry.msLevel === level || level === 'Both') {
                 if (entry.time <= rtEnd && entry.time >= rtBegin) {
-                  self.spectra[currentIndex] = Object.assign({}, entry);
-                  currentIndex++;
+                  self.spectra[entry.currentId] = Object.assign({}, entry);
                   entry = {};                  
                 }
               }
@@ -79,9 +73,6 @@ module.exports = class JsMzml {
               case 'zlib compression':
                 isCompressed = true;
                 break;
-              case 'no compression':
-                isCompressed = false;
-                break;
               case 'ms level':
                 entry.msLevel = node.attributes.value;
                 break;
@@ -91,9 +82,9 @@ module.exports = class JsMzml {
           }
           break;
       }
-    };
+    });
 
-    parser.ontext = function(raw) {
+    saxStream.on("text", function(raw) {
       if (readRaw && currentId) {
         if (nextValue === 'MASS') {
           entry.mass = self.decodeData(raw, bitType, isCompressed);
@@ -102,42 +93,28 @@ module.exports = class JsMzml {
         }
         nextValue = null;
       }
-    };
+    });
 
-    parser.onend = function() {
+    saxStream.on("end", function() {
       self.isFinished = true;
-    };
+      callback();
+    });
 
-    parser.onerror = function(err) {
-      self.isFinished = true;
-    };
-
-    //var data = fs.readFileSync(this.filename);
-    //parser.write(data).close();
-    var stream = fs.createReadStream(this.filename);
-    parser = sax.createStream(true, {trim: true});
-    stream.pipe(parser);
-
-    while (self.isFinished === false) {
-      await self.sleep(1000);
-    }
-    //  .on('end', function() {
-    //    callback()
-    //  });
-    //onFinished(parser, callback());
-    //return;
+    fs.createReadStream(this.filename)
+      .pipe(saxStream);
   }
 
   decodeData(raw, bitType, isCompressed) {
     var array = [];
     var buffer = base64.toByteArray(raw);
-    if (isCompressed === true) {
+    if (isCompressed) {
       buffer = pako.inflate(buffer);
     }
+
     if (bitType === '32') {
       return new Float32Array(buffer.buffer);
     }
-    else if (bitType === '64') {      
+    else if (bitType === '64') {
       return new Float64Array(buffer.buffer);
     }
     else {
@@ -145,9 +122,4 @@ module.exports = class JsMzml {
     }
     return [];
   }
-
-  sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
 }
