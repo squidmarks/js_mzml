@@ -1,22 +1,23 @@
 var jsmzml = require('./index');
 
-filename = 'C:/Users/Mike/msdata/porter_testing01_171128120533.mzML';
-//filename = './test/spectra/small_64bit.mzML';
+//filename = 'C:/Users/Mike/msdata/porter_testing01_171128120533.mzML';
+filename = './test/spectra/small_64bit.mzML';
 var thing = new jsmzml(filename);
 
-/*
+
 var options = {
     'level': 'Both',
     'rtBegin': 0,
     'rtEnd': 0.005
 };
-*/
 
+/*
 var options = {
     'level': 'Both',
     'rtBegin': 10,
     'rtEnd': 15
 };
+*/
 
 function itFinished() {
     console.log(thing);

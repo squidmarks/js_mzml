@@ -29,6 +29,8 @@ module.exports = class JsMzml {
 
     var self = this;
 
+    var index = 1;
+
     saxStream.on("opentag", function(node) {
       readRaw = node.name === 'binary';
 
@@ -41,13 +43,14 @@ module.exports = class JsMzml {
             if (Object.keys(entry).length > 0) {
               if (entry.msLevel === level || level === 'Both') {
                 if (entry.time <= rtEnd && entry.time >= rtBegin) {
-                  self.spectra[entry.currentId] = Object.assign({}, entry);
+                  self.spectra[index] = Object.assign({}, entry);
+                  index++;
                   entry = {};                  
                 }
               }
             }
             currentId = node.attributes.id;
-            entry.currentId = currentId;
+            entry.id = currentId;
           }
           break;
         case 'chromatogram':

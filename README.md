@@ -36,7 +36,7 @@ The spectra will be of this form:
 ```javascript
  {'1':
     {
-        currentId: 'controllerType=0 controllerNumber=1 scan=1',
+        id: 'controllerType=0 controllerNumber=1 scan=1',
         msLevel: '1',
         time: 0.004935,
         mass:
