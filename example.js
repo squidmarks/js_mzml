@@ -21,10 +21,10 @@ var options = {
 function itFinished() {
     console.log(thing);
     console.log(thing.isFinished);
+    console.log(Object.keys(thing.spectra).length);
 }
 
 thing.retrieve(options, itFinished);
 console.log(thing.isFinished);
-console.log(Object.keys(thing.spectra).length);
 
 

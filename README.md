@@ -2,7 +2,7 @@
 
 js-mzML is a node module for parsing mzML files used in mass spectrometry.
 
-This module is based off of another module [found here](https://github.com/cheminfo-js/mzML), but some changes have been made. Notably:
+This module is based off of cheminfo-js/mzML [found here](https://github.com/cheminfo-js/mzML), but some changes have been made. Notably:
 * Both 32-bit and 64-bit compression is supported
 * With or without zlib compression is supported
 * The MS level can be specified
