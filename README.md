@@ -10,10 +10,6 @@ This module is based off of cheminfo-js/mzML [found here](https://github.com/che
 
 General information on how to decode mzML files also comes from [here](http://www.bryanesmith.com/docs/reading-binary-data-mzml/).
 
----
-Please take note that I am planning on some major improvements. The file is currently read via a filestream, but the spectra are returned in a single object. As I have time in the coming future, I am going to add in a generator function to stream back the spectra as the file is read. The idea is to keep RAM usage low. I plan on keeping all the current functionality, but please be aware that this module will be undergoing active development.
----
-
 ## Usage
 js-mzML is installed with ```npm install -s js-mzml```
 
@@ -77,5 +73,5 @@ No breaking changes are expected in future versions, but this module was created
 ## Future Development
 * Ability to specify minutes/seconds for retention time
 * More MS levels (e.g. MS/MS/MS)
-* Returning the data using a generator function
+* Returning the data using a generator function (my knowledge is lacking as to how to do this in an async function so this is on hold indefinitely)
 
