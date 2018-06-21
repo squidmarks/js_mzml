@@ -75,3 +75,6 @@ No breaking changes are expected in future versions, but this module was created
 * More MS levels (e.g. MS/MS/MS)
 * Returning the data using a generator function (my knowledge is lacking as to how to do this in an async function so this is on hold indefinitely)
 
+## Support this project!
+
+[![Support this project on Patreon!](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/MikeTheBiochem)
