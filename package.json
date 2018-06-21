@@ -4,7 +4,7 @@
   "description": "An mzML parser",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "test": "node ./test/test-index.js | tap-spec && node ./test/test-index-32bit.js | tap-spec && node ./test/test-index-32bit-zlib.js | tap-spec && node ./test/test-index-64bit.js | tap-spec && node ./test/test-index-64bit-zlib.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,9 @@
   "devDependencies": {
     "chai": "^4.0.1",
     "fs": "0.0.1-security",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "tap-spec": "^5.0.0",
+    "tape": "^4.9.1"
   },
   "dependencies": {
     "base64-js": "^1.3.0",

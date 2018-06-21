@@ -1,7 +1,7 @@
 var jsmzml = require('./index');
 
 //filename = 'C:/Users/Mike/msdata/porter_testing01_171128120533.mzML';
-filename = './test/spectra/small_64bit.mzML';
+filename = './test/spectra/small_32bit_zlib.mzML';
 var thing = new jsmzml(filename);
 
 
