@@ -79,6 +79,12 @@ module.exports = class JsMzml {
               case 'ms level':
                 entry.msLevel = node.attributes.value;
                 break;
+              case 'positive scan':
+                entry.ESIpolarity = 0;
+                break;
+              case 'negative scan':
+                entry.ESIpolarity = 1;
+                break;
               default:
                 nextValue = null;
                 break;
