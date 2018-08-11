@@ -16,8 +16,8 @@ module.exports = class JsMzml {
     var options = options || {};
     var level = options.level || "Both";
     var rtBegin = options.rtBegin || 0;
-    var rtEnd = options.rtEnd || 9999999999;
-
+    var rtEnd = options.rtEnd || 9999999999;    
+    
     this.isFinished = false;
     var entry = {};
     var currentId;
@@ -84,6 +84,12 @@ module.exports = class JsMzml {
                 break;
               case 'negative scan':
                 entry.ESIpolarity = 1;
+                break;
+              case 'scan window lower limit':
+                entry.scanLowerLimit = node.attributes.value;
+                break;
+              case 'scan window upper limit':
+                entry.scanUpperLimit = node.attributes.value;
                 break;
               default:
                 nextValue = null;

@@ -1,31 +1,31 @@
 var jsmzml = require('./index');
 
-//filename = 'C:/Users/Mike/msdata/porter_testing01_171128120533.mzML';
-filename = './test/spectra/small_32bit_zlib.mzML';
+var filename = './test/spectra/3.mzML';
 var thing = new jsmzml(filename);
 
+var sumSpectra = function(spectra){
+    var summedPosSpectra={};
+    var summedNegSpectra={};
+    for (let index = spectra[1].scanLowerLimit; index <= spectra[1].scanUpperLimit; index++) {
+        summedPosSpectra[index]=0;
+        summedNegSpectra[index]=0;        
+    }
 
-var options = {
-    'level': 'Both',
-    'rtBegin': 0,
-    'rtEnd': 0.005
-};
-
-/*
-var options = {
-    'level': 'Both',
-    'rtBegin': 10,
-    'rtEnd': 15
-};
-*/
-
-function itFinished() {
-    console.log(thing);
-    console.log(thing.isFinished);
-    console.log(Object.keys(thing.spectra).length);
+    Object.keys(spectra).forEach(function (key) {
+        for (let j = 0; j < spectra[key].mass.length; j++) {
+            if (spectra[key].ESIpolarity==0) summedPosSpectra[Math.round(spectra[key].mass[j])]+=spectra[key].intensity[j];
+            if (spectra[key].ESIpolarity==1) summedNegSpectra[Math.round(spectra[key].mass[j])]+=spectra[key].intensity[j];
+        }
+    });
+    console.log(summedPosSpectra);
+    return {pos: summedPosSpectra, neg: summedNegSpectra}
 }
 
-thing.retrieve(options, itFinished);
-console.log(thing.isFinished);
+function itFinished() {
+    sumSpectra(thing.spectra);
+    //console.log(thing.spectra);
+}
+
+thing.retrieve({}, itFinished);
 
 
