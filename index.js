@@ -1,6 +1,5 @@
 var base64 = require('base64-js');
 var pako = require('pako');
-var saxStream = require('sax').createStream(true);
 var fs = require('fs');
 
 module.exports = class JsMzml {
@@ -18,6 +17,7 @@ module.exports = class JsMzml {
     var rtBegin = options.rtBegin || 0;
     var rtEnd = options.rtEnd || 9999999999;    
     
+    this.spectra = {};
     this.isFinished = false;
     var entry = {};
     var currentId;
@@ -26,6 +26,7 @@ module.exports = class JsMzml {
     var readRaw;
     var bitType;
     var isCompressed;
+    var saxStream = require('sax').createStream(true);
 
     var self = this;
 
