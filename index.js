@@ -1,4 +1,4 @@
-var base64 = require('base64-js');
+var decode = require('tab64').decode
 var pako = require('pako');
 var fs = require('fs');
 
@@ -122,20 +122,23 @@ module.exports = class JsMzml {
 
   decodeData(raw, bitType, isCompressed) {
     var array = [];
-    var buffer = base64.toByteArray(raw);
-    if (isCompressed) {
-      buffer = pako.inflate(buffer);
-    }
+    //var buffer = base64.toByteArray(raw);
+    //if (isCompressed) {
+    //  buffer = pako.inflate(buffer);
+    //}
 
     if (bitType === '32') {
-      return new Float32Array(buffer.buffer);
+      return decode(raw, 'float32')
+      //return new Float32Array(buffer.buffer);
     }
     else if (bitType === '64') {
-      return new Float64Array(buffer.buffer);
+      return decode(raw, 'float64')
+      //return new Float64Array(buffer.buffer);
     }
     else {
       return [];
     }
     return [];
   }
+} }
 }
